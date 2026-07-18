@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineStream — Tentang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#05070d;
+    --bg-soft:#0a0d16;
+    --card:#0d111c;
+    --border:#1b2233;
+    --cyan:#2fe4ff;
+    --purple:#9b5cff;
+    --text:#eef1f8;
+    --muted:#7c8499;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(900px 400px at 50% 0%, rgba(47,228,255,0.08), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    overflow-x:hidden;
+  }
+  a{ text-decoration:none; color:inherit; }
+
+  /* ===== Top brand ===== */
+  .brandbar{ text-align:center; padding:46px 6% 22px; }
+  .brandbar h1{
+    font-family:'Archivo Black', sans-serif;
+    font-size:clamp(28px,4vw,40px);
+    margin:0;
+    background:linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    letter-spacing:1px;
+    text-shadow:0 0 30px rgba(47,228,255,0.25);
+  }
+  .brandbar p{ margin:8px 0 0; font-size:11.5px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; }
+
+  /* ===== Nav ===== */
+  nav.menu{
+    display:flex; justify-content:center; gap:6px;
+    padding:14px 6%; border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    flex-wrap:wrap;
+  }
+  nav.menu a{
+    font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:13px;
+    letter-spacing:0.6px; text-transform:uppercase;
+    color:var(--muted); padding:9px 18px; border-radius:999px;
+    position:relative; transition:all 0.25s ease;
+  }
+  nav.menu a:hover{ color:var(--text); background:rgba(255,255,255,0.06); }
+  nav.menu a.active{
+    color:#05070d; background:linear-gradient(120deg,var(--cyan),var(--purple));
+    box-shadow:0 4px 18px rgba(47,228,255,0.28);
+  }
+
+  /* ===== Page header ===== */
+  .page-head{ padding:44px 6% 10px; text-align:center; }
+  .page-head .eyebrow{
+    font-size:11px; letter-spacing:3px; color:var(--purple); text-transform:uppercase; font-weight:700;
+  }
+  .page-head h2{
+    font-family:'Archivo Black', sans-serif; font-size:clamp(26px,4vw,38px); margin:10px 0 8px;
+  }
+  .page-head h2 span{ color:var(--cyan); }
+  .page-head p{ color:var(--muted); font-size:13.5px; max-width:560px; margin:0 auto; }
+
+  /* ===== Content ===== */
+  .about-wrap{ padding:20px 6% 10px; }
+
+  .about-card{
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    padding:32px clamp(20px,4vw,40px); margin-bottom:22px;
+  }
+  .about-card h3{
+    font-family:'Archivo Black', sans-serif; font-size:18px; margin:0 0 14px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .about-card h3 .bar{ width:4px; height:18px; background:var(--cyan); border-radius:2px; box-shadow:0 0 8px var(--cyan); }
+  .about-card p{ color:var(--muted); font-size:14px; line-height:1.85; margin:0 0 14px; }
+  .about-card p:last-child{ margin-bottom:0; }
+  .about-card p b{ color:var(--text); font-weight:700; }
+  .about-card p span.accent{ color:var(--cyan); font-weight:600; }
+
+  .feature-grid{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr));
+    gap:16px; margin-top:6px;
+  }
+  .feature{
+    background:var(--bg-soft); border:1px solid var(--border); border-radius:12px;
+    padding:20px 18px;
+  }
+  .feature .ficon{
+    width:38px; height:38px; border-radius:10px; margin-bottom:12px;
+    background:linear-gradient(120deg, rgba(47,228,255,0.15), rgba(155,92,255,0.15));
+    border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .feature .ficon svg{ width:18px; height:18px; color:var(--cyan); }
+  .feature h4{ font-family:'Space Grotesk', sans-serif; font-size:14px; margin:0 0 6px; }
+  .feature p{ color:var(--muted); font-size:12.5px; line-height:1.6; margin:0; }
+
+  .disclaimer{
+    border:1px dashed rgba(255,92,176,0.4); background:rgba(255,92,176,0.06);
+    border-radius:14px; padding:22px clamp(18px,4vw,32px);
+  }
+  .disclaimer h3{ color:#ff8fc4; }
+  .disclaimer h3 .bar{ background:#ff5cb0; box-shadow:0 0 8px #ff5cb0; }
+  .disclaimer p{ color:#c9a6bb; }
+
+  /* ===== Footer ===== */
+  footer{ margin-top:60px; border-top:1px solid var(--border); padding:46px 6% 30px; text-align:center; }
+  footer h3{
+    font-family:'Archivo Black', sans-serif; font-size:24px;
+    background:linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip:text; background-clip:text; color:transparent; margin:0 0 10px;
+  }
+  footer p{ color:var(--muted); font-size:13px; max-width:480px; margin:0 auto; line-height:1.6; }
+  .footer-bottom{
+    margin-top:34px; padding-top:20px; border-top:1px solid var(--border);
+    text-align:center; font-size:11.5px; color:var(--muted);
+  }
+
+  /* ===== Responsif: Tablet ===== */
+  @media(max-width:768px){
+    .brandbar{ padding:34px 6% 18px; }
+    nav.menu{ gap:4px; padding:12px 4%; }
+    nav.menu a{ padding:8px 14px; font-size:12px; }
+    .page-head{ padding:32px 5% 8px; }
+    .about-wrap{ padding:18px 5% 8px; }
+    .about-card{ padding:28px clamp(18px,4vw,32px); }
+    .feature-grid{ grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px; }
+  }
+
+  /* ===== Responsif: Mobile ===== */
+  @media(max-width:480px){
+    .brandbar{ padding:28px 6% 14px; }
+    nav.menu{ gap:3px; padding:10px 3%; }
+    nav.menu a{ padding:7px 11px; font-size:11.5px; }
+    .page-head{ padding:26px 5% 6px; }
+    .page-head p{ font-size:12.5px; }
+    .about-card{ padding:24px 18px; }
+    .about-card h3{ font-size:16px; }
+    .about-card p{ font-size:13px; line-height:1.75; }
+    .feature-grid{ grid-template-columns:1fr; gap:12px; }
+    .disclaimer{ padding:20px 18px; }
+    footer{ padding:34px 6% 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <h1>CINESTREAM</h1>
+  <p>Pengalaman Sinema Premium</p>
+</div>
+
+<nav class="menu">
+  <a href="index.html">Beranda</a>
+  <a href="film.html">Film</a>
+  <a href="daftar-saya.html">Daftar Saya</a>
+  <a href="#" class="active">Tentang</a>
+</nav>
+
+<div class="page-head">
+  <div class="eyebrow">Kenali Kami</div>
+  <h2>TENTANG <span>CINESTREAM</span></h2>
+  <p>Kenali lebih dekat CineStream, dan apa yang membuatnya jadi tempat streaming film favoritmu.</p>
+</div>
+
+<div class="about-wrap">
+
+  <div class="about-card">
+    <h3><span class="bar"></span>Apa Itu CineStream?</h3>
+    <p><b>CineStream</b> adalah<span class="accent"> platform streaming film</span> bertema sinema modern. Kamu bisa menjelajahi koleksi film lengkap dengan poster, rating, dan genre, lalu menyimpannya ke dalam <b>Daftar Saya</b> untuk ditonton nanti. Bisa juga mengaktifkan pengingat untuk film yang belum rilis, layaknya pengalaman menonton di layanan streaming premium.</p>
+  </div>
+
+  <div class="about-card">
+    <h3><span class="bar"></span>Fitur Utama</h3>
+    <div class="feature-grid">
+      <div class="feature">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+        <h4>Jelajahi Koleksi Film</h4>
+        <p>Lihat koleksi film di halaman Beranda dan Film, lengkap dengan pencarian judul dan filter genre khusus di halaman Film.</p>
+      </div>
+      <div class="feature">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+        <h4>Simpan &amp; Ingatkan</h4>
+        <p>Tandai film yang sudah rilis untuk disimpan ke Daftar Saya. Untuk film yang akan hadir, aktifkan saja pengingatnya, semua tersimpan di satu tempat.</p>
+      </div>
+      <div class="feature">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+        <h4>Putar Sekarang</h4>
+        <p>Klik poster film pilihanmu, lalu tekan tombol Putar untuk langsung menontonnya</p>
+      </div>
+      <div class="feature">
+        <div class="ficon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <h4>Rilisan Akan Datang</h4>
+        <p>Dapatkan info film yang akan segera hadir lewat penanda "Akan Hadir".</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-card disclaimer">
+    <h3><span class="bar"></span>Catatan Penting</h3>
+    <p>CineStream adalah proyek demo/portofolio <b>M. Radhi Billah dengan NIM: 240131051</b> dan <b>bukan layanan streaming resmi</b>. Seluruh data film, poster, dan konten yang ditampilkan digunakan hanya untuk tujuan tampilan &amp; pembelajaran, bukan untuk distribusi komersial.</p>
+  </div>
+
+</div>
+
+<footer>
+  <h3>CINESTREAM</h3>
+  <p>Destinasi utama untuk menikmati tontonan premium tanpa batas dengan visual memukau.</p>
+  <div class="footer-bottom">
+    <span>HAK CIPTA © 2026 CINESTREAM GLOBAL. SELURUH HAK CIPTA DILINDUNGI UNDANG-UNDANG.</span>
+  </div>
+</footer>
+
+</body>
+</html>

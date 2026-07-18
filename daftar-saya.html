@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineStream — Daftar Saya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#05070d;
+    --bg-soft:#0a0d16;
+    --card:#0d111c;
+    --border:#1b2233;
+    --cyan:#2fe4ff;
+    --purple:#9b5cff;
+    --text:#eef1f8;
+    --muted:#7c8499;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(900px 400px at 50% 0%, rgba(47,228,255,0.08), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    overflow-x:hidden;
+  }
+  a{ text-decoration:none; color:inherit; }
+  button, input{ font-family:inherit; cursor:pointer; }
+
+  /* ===== Top brand (sama dengan Beranda) ===== */
+  .brandbar{ text-align:center; padding:46px 6% 22px; }
+  .brandbar h1{
+    font-family:'Archivo Black', sans-serif;
+    font-size:clamp(28px,4vw,40px);
+    margin:0;
+    background:linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    letter-spacing:1px;
+    text-shadow:0 0 30px rgba(47,228,255,0.25);
+  }
+  .brandbar p{ margin:8px 0 0; font-size:11.5px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; }
+
+  /* ===== Nav ===== */
+  nav.menu{
+    display:flex; justify-content:center; gap:6px;
+    padding:14px 6%; border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    flex-wrap:wrap;
+  }
+  nav.menu a{
+    font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:13px;
+    letter-spacing:0.6px; text-transform:uppercase;
+    color:var(--muted); padding:9px 18px; border-radius:999px;
+    position:relative; transition:all 0.25s ease;
+  }
+  nav.menu a:hover{ color:var(--text); background:rgba(255,255,255,0.06); }
+  nav.menu a.active{
+    color:#05070d; background:linear-gradient(120deg,var(--cyan),var(--purple));
+    box-shadow:0 4px 18px rgba(47,228,255,0.28);
+  }
+
+  /* ===== Page header ===== */
+  .page-head{ padding:44px 6% 10px; text-align:center; }
+  .page-head .eyebrow{
+    font-size:11px; letter-spacing:3px; color:var(--purple); text-transform:uppercase; font-weight:700;
+  }
+  .page-head h2{
+    font-family:'Archivo Black', sans-serif; font-size:clamp(26px,4vw,38px); margin:10px 0 8px;
+  }
+  .page-head h2 span{ color:var(--cyan); }
+  .page-head p{ color:var(--muted); font-size:13.5px; max-width:560px; margin:0 auto; }
+
+  /* ===== Toolbar ===== */
+  .filter-bar{
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    padding:26px 6% 6px;
+  }
+  .search-wrap{
+    flex:1 1 260px; display:flex; align-items:center; gap:10px;
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:12px 16px;
+  }
+  .search-wrap svg{ width:16px; height:16px; color:var(--muted); flex:none; }
+  .search-wrap input{
+    flex:1; background:none; border:none; outline:none; color:var(--text); font-size:13.5px;
+  }
+  .search-wrap input::placeholder{ color:var(--muted); }
+  .btn-clear{
+    flex:none; background:rgba(255,92,176,0.08); border:1px solid rgba(255,92,176,0.35); color:#ff8fc4;
+    border-radius:10px; padding:12px 16px; font-size:12.5px; font-weight:700; letter-spacing:.3px;
+    display:flex; align-items:center; gap:8px; white-space:nowrap;
+  }
+  .btn-clear:hover{ background:rgba(255,92,176,0.16); }
+  .btn-clear svg{ width:14px; height:14px; }
+  .result-count{ padding:18px 6% 0; color:var(--muted); font-size:12.5px; }
+  .result-count b{ color:var(--text); }
+
+  /* ===== Grid ===== */
+  .grid-wrap{ padding:16px 6% 20px; min-height:180px; }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(170px, 1fr));
+    gap:20px;
+  }
+  .poster{
+    background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden;
+    position:relative; transition:transform .2s ease, border-color .2s ease;
+    cursor:pointer;
+  }
+  .poster:hover{ transform:translateY(-4px); border-color:var(--cyan); }
+
+  .poster-art{
+    height:250px; position:relative; display:flex; align-items:flex-end; justify-content:center; padding:14px;
+    color:rgba(255,255,255,0.9); font-family:'Archivo Black', sans-serif; font-size:15px; line-height:1.15;
+    text-shadow:0 2px 10px rgba(0,0,0,0.7); text-align:center;
+  }
+  .poster-art::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.75) 100%); }
+  .poster-art span.title{ position:relative; z-index:1; }
+
+  .p0{ background: radial-gradient(circle at 50% 20%, #3a4a5e, #0c121d 75%); }
+  .p1{ background: linear-gradient(160deg,#3b2f1d,#0c121d 70%); }
+  .p2{ background: radial-gradient(circle at 50% 70%, #1d2a17, #060a06 75%); }
+  .p3{ background: linear-gradient(160deg,#2b3a2a,#0c1610 70%); }
+  .p4{ background: radial-gradient(circle at 70% 20%, #1a2233, #04060a 75%); }
+  .p5{ background: linear-gradient(160deg,#262c3a,#05070d 70%); }
+  .p6{ background: linear-gradient(160deg,#3a3220,#0d0a05 70%); }
+  .p7{ background: radial-gradient(circle at 60% 30%, #3a2a3a,#0d0a10 75%); }
+  .p8{ background: radial-gradient(circle at 40% 60%, #2a3a3a,#0a1010 75%); }
+  .p9{ background: linear-gradient(160deg,#3a1f2a,#0c0508 70%); }
+
+  .rating{
+    position:absolute; top:10px; left:10px; z-index:2;
+    background:rgba(5,7,13,0.85); border:1px solid var(--border); color:#ffce4a;
+    font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px;
+    display:flex; align-items:center; gap:4px;
+  }
+  .badge-coming{
+    position:absolute; top:10px; right:10px; z-index:2;
+    background:linear-gradient(90deg, var(--cyan), var(--purple)); color:#04060b;
+    font-family:'Archivo Black', sans-serif;
+    font-size:10px; font-weight:800; letter-spacing:.5px; padding:4px 9px; border-radius:5px;
+  }
+  .poster-foot{
+    padding:11px 13px 14px; font-size:12px; font-weight:700; letter-spacing:.3px; color:var(--text);
+    display:flex; align-items:center; gap:8px;
+  }
+  .poster-foot .ftitle{
+    flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;
+  }
+  .btn-remove{
+    flex:none; width:26px; height:26px; border-radius:50%; border:1px solid var(--border);
+    background:rgba(255,255,255,0.04); color:var(--muted);
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; line-height:1; transition:all .2s ease;
+  }
+  .btn-remove:hover{ background:rgba(255,92,176,0.16); border-color:#ff5cb0; color:#ff8fc4; }
+
+  .empty-state{
+    text-align:center; padding:90px 20px 60px; color:var(--muted);
+  }
+  .empty-state .bar-icon{
+    width:56px; height:56px; margin:0 auto 20px; border-radius:16px; background:var(--card);
+    border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+  }
+  .empty-state .bar-icon svg{ width:26px; height:26px; color:var(--muted); }
+  .empty-state h3{ color:var(--text); font-family:'Archivo Black', sans-serif; font-size:19px; margin:0 0 8px; }
+  .empty-state p{ font-size:13px; margin:0 0 22px; max-width:400px; margin-left:auto; margin-right:auto; }
+  .empty-state .btn-play{
+    display:inline-flex; align-items:center; gap:10px;
+    background:linear-gradient(90deg, var(--cyan), var(--purple)); color:#04060b;
+    font-weight:800; font-size:13.5px; letter-spacing:.5px; padding:14px 26px; border-radius:10px;
+    box-shadow:0 6px 24px rgba(47,228,255,0.25); border:none;
+  }
+
+  /* ===== Footer (sama dengan Beranda) ===== */
+  footer{ margin-top:60px; border-top:1px solid var(--border); padding:46px 6% 30px; text-align:center; }
+  footer h3{
+    font-family:'Archivo Black', sans-serif; font-size:24px;
+    background:linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip:text; background-clip:text; color:transparent; margin:0 0 10px;
+  }
+  footer p{ color:var(--muted); font-size:13px; max-width:480px; margin:0 auto; line-height:1.6; }
+  .footer-bottom{
+    margin-top:34px; padding-top:20px; border-top:1px solid var(--border);
+    text-align:center; font-size:11.5px; color:var(--muted);
+  }
+
+  /* ===== Daftar Saya - Section Headers (disamakan dengan Beranda) ===== */
+  .mylist-section{ padding:38px 0 0; }
+  .mylist-section-title{
+    font-family:'Archivo Black', sans-serif; font-size:19px; margin:0;
+    display:flex; align-items:center; gap:10px; letter-spacing:.4px;
+  }
+  .mylist-section-title .bar{ width:4px; height:20px; background:var(--cyan); border-radius:2px; box-shadow:0 0 8px var(--cyan); }
+  .mylist-section-title .accent{ color:var(--cyan); }
+
+  /* ===== Responsif: Tablet ===== */
+  @media(max-width:768px){
+    .brandbar{ padding:34px 6% 18px; }
+    nav.menu{ gap:4px; padding:12px 4%; }
+    nav.menu a{ padding:8px 14px; font-size:12px; }
+    .page-head{ padding:32px 5% 8px; }
+    .filter-bar{ padding:20px 5% 6px; }
+    .grid{ grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:16px; }
+    .poster-art{ height:220px; }
+  }
+
+  /* ===== Responsif: Mobile ===== */
+  @media(max-width:480px){
+    .brandbar{ padding:28px 6% 14px; }
+    nav.menu{ gap:3px; padding:10px 3%; }
+    nav.menu a{ padding:7px 11px; font-size:11.5px; }
+    .page-head{ padding:26px 5% 6px; }
+    .page-head p{ font-size:12.5px; }
+    .filter-bar{ flex-direction:column; align-items:stretch; padding:18px 5% 4px; }
+    .search-wrap{ flex:1 1 100%; }
+    .grid{ grid-template-columns:repeat(auto-fill, minmax(128px, 1fr)); gap:12px; }
+    .poster-art{ height:175px; font-size:13px; }
+    .poster-foot{ padding:9px 10px 12px; font-size:11px; }
+    .empty-state{ padding:44px 16px; }
+    .action-modal-box{ width:100%; }
+    footer{ padding:34px 6% 24px; }
+  }
+
+  /* ===== Popup Aksi Film (Putar / Hapus dari Daftar) ===== */
+  .action-modal{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(4,6,10,0.75);
+    backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity .2s ease;
+    padding:20px;
+  }
+  .action-modal.open{ opacity:1; pointer-events:auto; }
+  .action-modal-box{
+    width:min(380px, 100%);
+    background:var(--bg-soft);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+    transform:scale(.94);
+    transition:transform .2s ease;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  }
+  .action-modal.open .action-modal-box{ transform:scale(1); }
+  .action-modal-art{
+    height:180px; position:relative; background-size:cover; background-position:top center;
+    display:flex; align-items:flex-end; padding:16px;
+  }
+  .action-modal-art::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.05) 30%, rgba(5,7,13,0.92) 100%); }
+  .action-modal-art .amtitle{
+    position:relative; z-index:1; font-family:'Archivo Black', sans-serif; font-size:18px; line-height:1.25; text-align:center; width:100%;
+  }
+  .action-modal-close{
+    position:absolute; top:10px; right:10px; z-index:2;
+    width:32px; height:32px; border-radius:50%; border:1px solid var(--border);
+    background:rgba(5,7,13,0.7); color:var(--text); display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  .action-modal-close:hover{ border-color:var(--cyan); color:var(--cyan); }
+  .action-modal-body{ padding:18px 20px 22px; display:flex; flex-direction:column; gap:10px; }
+  .action-btn{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    font-weight:800; font-size:13px; letter-spacing:.4px; padding:13px 18px; border-radius:10px; border:none; width:100%;
+  }
+  .action-btn-play{ background:linear-gradient(90deg, var(--cyan), var(--purple)); color:#04060b; box-shadow:0 6px 20px rgba(47,228,255,0.25); }
+  .action-btn-remove{ background:rgba(255,92,176,0.1); border:1px solid #ff5cb0; color:#ff8fc4; }
+  .action-btn-remove:hover{ background:rgba(255,92,176,0.18); }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <h1>CINESTREAM</h1>
+  <p>Pengalaman Sinema Premium</p>
+</div>
+
+<nav class="menu">
+  <a href="index.html">Beranda</a>
+  <a href="film.html">Film</a>
+  <a href="#" class="active">Daftar Saya</a>
+  <a href="tentang.html">Tentang</a>
+</nav>
+
+<div class="page-head">
+  <div class="eyebrow">Koleksi Pribadi</div>
+  <h2>DAFTAR <span>SAYA</span></h2>
+  <p>Film yang kamu simpan atau ingatkan lewat tombol "+" di Beranda maupun halaman Film, semuanya ada di sini.</p>
+</div>
+
+<div class="filter-bar">
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" id="search-input" placeholder="Cari di daftar saya...">
+  </div>
+  <button class="btn-clear" id="clear-btn" onclick="clearAll()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+    Hapus Semua
+  </button>
+</div>
+
+<div class="result-count" id="result-count"></div>
+
+<div class="grid-wrap">
+  <div class="grid" id="mylist-grid"></div>
+</div>
+
+<footer>
+  <h3>CINESTREAM</h3>
+  <p>Destinasi utama untuk menikmati tontonan premium tanpa batas dengan visual memukau.</p>
+  <div class="footer-bottom">
+    <span>HAK CIPTA © 2026 CINESTREAM GLOBAL. SELURUH HAK CIPTA DILINDUNGI UNDANG-UNDANG.</span>
+  </div>
+</footer>
+
+<!-- Popup Aksi Film -->
+<div class="action-modal" id="action-modal">
+  <div class="action-modal-box">
+    <div class="action-modal-art" id="action-modal-art">
+      <button class="action-modal-close" onclick="closeMovieAction()">✕</button>
+      <span class="amtitle" id="action-modal-title"></span>
+    </div>
+    <div class="action-modal-body">
+      <button class="action-btn action-btn-play" id="action-btn-play" onclick="playCurrentMovie()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        PUTAR FILM
+      </button>
+      <button class="action-btn action-btn-remove" id="action-btn-remove" onclick="removeCurrentMovie()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        HAPUS DARI DAFTAR SIMPAN
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ===== Daftar Saya (localStorage) — key sama dengan Beranda & Film ===== */
+  const MYLIST_KEY = 'cinestream_daftarsaya';
+  function getMyList(){
+    try{ return JSON.parse(localStorage.getItem(MYLIST_KEY)) || []; }catch(e){ return []; }
+  }
+  function saveMyList(list){ localStorage.setItem(MYLIST_KEY, JSON.stringify(list)); }
+
+  let query = "";
+
+  function removeFromList(title){
+    let list = getMyList();
+    list = list.filter(x => x.t !== title);
+    saveMyList(list);
+    render();
+  }
+
+  function clearAll(){
+    if(getMyList().length === 0) return;
+    if(confirm('Hapus semua film dari Daftar Saya?')){
+      saveMyList([]);
+      render();
+    }
+  }
+
+  window.__movieMap = window.__movieMap || {};
+  function posterCard(m){
+    window.__movieMap[m.t] = m;
+    const bg = m.img ? `style="background-image:url('${m.img}');background-size:cover;background-position:top center;"` : '';
+    const rating = typeof m.r === 'number' && m.r > 0 ? `<span class="rating">★ ${m.r.toFixed(1)}</span>` : '';
+    const safeTitle = m.t.replace(/'/g, "\\'");
+    return `
+      <div class="poster" onclick="openMovieAction('${safeTitle}')" style="cursor:pointer;">
+        <div class="poster-art ${m.img ? '' : (m.p || 'p0')}" ${bg}>
+          ${rating}
+          ${m.coming ? '<span class="badge-coming">AKAN HADIR</span>' : ''}
+          ${m.img ? '' : `<span class="title">${m.t}${m.sub ? `<br><small style="font-weight:500;font-size:11px;color:#9aa3b5;">${m.sub}</small>` : ''}</span>`}
+        </div>
+        <div class="poster-foot">
+          <span class="ftitle">${m.t}</span>
+        </div>
+      </div>`;
+  }
+
+  /* ===== Popup Aksi Film (Putar / Hapus dari Daftar) ===== */
+  let currentActionMovie = null;
+  function openMovieAction(title){
+    const m = window.__movieMap[title];
+    if(!m) return;
+    currentActionMovie = m;
+    const art = document.getElementById('action-modal-art');
+    art.className = 'action-modal-art' + (m.img ? '' : ' ' + (m.p || 'p0'));
+    art.style.backgroundImage = m.img ? `url('${m.img}')` : '';
+    document.getElementById('action-modal-title').innerHTML =
+      m.t + (m.sub ? `<br><small style="font-weight:500;font-size:12px;color:#9aa3b5;">${m.sub}</small>` : '');
+    // Hide play button for coming movies
+    document.getElementById('action-btn-play').style.display = (m.yt && !m.coming) ? 'flex' : 'none';
+    // Update remove button text based on coming status
+    const removeBtn = document.getElementById('action-btn-remove');
+    removeBtn.innerHTML = m.coming
+      ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg> HAPUS DARI PENGINGAT`
+      : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg> HAPUS DARI DAFTAR SIMPAN`;
+    document.getElementById('action-modal').classList.add('open');
+    document.body.classList.add('locked');
+  }
+  function removeCurrentMovie(){
+    if(!currentActionMovie) return;
+    removeFromList(currentActionMovie.t);
+    closeMovieAction();
+  }
+  function playCurrentMovie(){
+    if(currentActionMovie && currentActionMovie.yt) window.open(currentActionMovie.yt, '_blank');
+  }
+  function closeMovieAction(){
+    currentActionMovie = null;
+    document.getElementById('action-modal').classList.remove('open');
+    document.body.classList.remove('locked');
+  }
+  document.getElementById('action-modal').addEventListener('click', e=>{
+    if(e.target.id === 'action-modal') closeMovieAction();
+  });
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape') closeMovieAction();
+  });
+
+  function render(){
+    const list = getMyList().filter(m => m.t.toLowerCase().includes(query.toLowerCase()));
+    const grid = document.getElementById('mylist-grid');
+    const countEl = document.getElementById('result-count');
+    const clearBtn = document.getElementById('clear-btn');
+
+    clearBtn.style.opacity = getMyList().length === 0 ? '.4' : '1';
+    clearBtn.style.pointerEvents = getMyList().length === 0 ? 'none' : 'auto';
+
+    if(getMyList().length === 0){
+      countEl.innerHTML = '';
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="bar-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h3>Daftar Kamu Masih Kosong</h3>
+          <p>Tekan tombol "+" pada film yang ingin kamu simpan maupun film yang akan hadir untuk menyimpannya di sini.</p>
+          <a class="btn-play" href="film.html">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            Jelajahi Film
+          </a>
+        </div>`;
+      return;
+    }
+
+    countEl.innerHTML = `Menampilkan <b>${list.length}</b> dari <b>${getMyList().length}</b> judul`;
+
+    if(list.length === 0){
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <div class="bar-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          </div>
+          <h3>Tidak Ditemukan</h3>
+          <p>Coba kata kunci lain.</p>
+        </div>`;
+      return;
+    }
+
+    // Split into coming and released
+    const coming = list.filter(m => m.coming === true);
+    const released = list.filter(m => m.coming !== true);
+    
+    let html = '';
+    
+    if(coming.length > 0){
+      html += `<div class="mylist-section" style="grid-column:1/-1;">
+        <div class="mylist-section-title">
+          <span class="bar"></span> PENGINGAT<span class="accent">AKAN HADIR</span>
+        </div>
+      </div>`;
+      html += coming.map(posterCard).join('');
+    }
+    
+    if(released.length > 0){
+      html += `<div class="mylist-section" style="grid-column:1/-1;">
+        <div class="mylist-section-title">
+          <span class="bar"></span>DAFTAR <span class="accent">SIMPAN</span>
+        </div>
+      </div>`;
+      html += released.map(posterCard).join('');
+    }
+
+    grid.innerHTML = html;
+  }
+
+  document.getElementById('search-input').addEventListener('input', e => {
+    query = e.target.value;
+    render();
+  });
+
+  render();
+</script>
+
+</body>
+</html>

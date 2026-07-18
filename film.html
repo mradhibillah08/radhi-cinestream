@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineStream — Film</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#05070d;
+    --bg-soft:#0a0d16;
+    --card:#0d111c;
+    --border:#1b2233;
+    --cyan:#2fe4ff;
+    --purple:#9b5cff;
+    --text:#eef1f8;
+    --muted:#7c8499;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(900px 400px at 50% 0%, rgba(47,228,255,0.08), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    overflow-x:hidden;
+  }
+  a{ text-decoration:none; color:inherit; }
+  button, input, select{ font-family:inherit; }
+
+  /* ===== Top brand (sama dengan Beranda) ===== */
+  .brandbar{ text-align:center; padding:46px 6% 22px; }
+  .brandbar h1{
+    font-family:'Archivo Black', sans-serif;
+    font-size:clamp(28px,4vw,40px);
+    margin:0;
+    background:linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    letter-spacing:1px;
+    text-shadow:0 0 30px rgba(47,228,255,0.25);
+  }
+  .brandbar p{ margin:8px 0 0; font-size:11.5px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; }
+
+  /* ===== Nav ===== */
+  nav.menu{
+    display:flex; justify-content:center; gap:6px;
+    padding:14px 6%; border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    flex-wrap:wrap;
+  }
+  nav.menu a{
+    font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:13px;
+    letter-spacing:0.6px; text-transform:uppercase;
+    color:var(--muted); padding:9px 18px; border-radius:999px;
+    position:relative; transition:all 0.25s ease;
+  }
+  nav.menu a:hover{ color:var(--text); background:rgba(255,255,255,0.06); }
+  nav.menu a.active{
+    color:#05070d; background:linear-gradient(120deg,var(--cyan),var(--purple));
+    box-shadow:0 4px 18px rgba(47,228,255,0.28);
+  }
+
+  /* ===== Page header ===== */
+  .page-head{ padding:44px 6% 10px; text-align:center; }
+  .page-head .eyebrow{
+    font-size:11px; letter-spacing:3px; color:var(--purple); text-transform:uppercase; font-weight:700;
+  }
+  .page-head h2{
+    font-family:'Archivo Black', sans-serif; font-size:clamp(26px,4vw,38px); margin:10px 0 8px;
+  }
+  .page-head h2 span{ color:var(--cyan); }
+  .page-head p{ color:var(--muted); font-size:13.5px; max-width:560px; margin:0 auto; }
+
+  /* ===== Filter bar ===== */
+  .filter-bar{
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    padding:26px 6% 6px;
+  }
+  .search-wrap{
+    flex:1 1 260px; display:flex; align-items:center; gap:10px;
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:12px 16px;
+  }
+  .search-wrap svg{ width:16px; height:16px; color:var(--muted); flex:none; }
+  .search-wrap input{
+    flex:1; background:none; border:none; outline:none; color:var(--text); font-size:13.5px;
+  }
+  .search-wrap input::placeholder{ color:var(--muted); }
+  .sort-select{
+    background:var(--card); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:12px 14px; font-size:13px; font-weight:600; cursor:pointer;
+  }
+  .genre-row{
+    display:flex; gap:10px; flex-wrap:wrap; padding:16px 6% 4px;
+  }
+  .chip{
+    background:var(--card); border:1px solid var(--border); color:var(--muted);
+    font-size:12px; font-weight:700; letter-spacing:.4px; padding:9px 16px; border-radius:999px;
+    white-space:nowrap;
+  }
+  .chip.active{
+    color:#04060b; border-color:transparent;
+    background:linear-gradient(90deg, var(--cyan), var(--purple));
+  }
+  .result-count{ padding:18px 6% 0; color:var(--muted); font-size:12.5px; }
+  .result-count b{ color:var(--text); }
+
+  /* ===== Grid ===== */
+  .grid-wrap{ padding:16px 6% 20px; }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(170px, 1fr));
+    gap:20px;
+  }
+  .poster{
+    background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden;
+    position:relative; transition:transform .2s ease, border-color .2s ease;
+    cursor:pointer;
+  }
+  .poster:hover{ transform:translateY(-4px); border-color:var(--cyan); }
+
+  .poster-art{
+    height:250px; position:relative; display:flex; align-items:flex-end; justify-content:center; padding:14px;
+    color:rgba(255,255,255,0.9); font-family:'Archivo Black', sans-serif; font-size:15px; line-height:1.15;
+    text-shadow:0 2px 10px rgba(0,0,0,0.7); text-align:center;
+  }
+  .poster-art::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.75) 100%); }
+  .poster-art span.title{ position:relative; z-index:1; }
+
+  .p0{ background: radial-gradient(circle at 50% 20%, #3a4a5e, #0c121d 75%); }
+  .p1{ background: linear-gradient(160deg,#3b2f1d,#0c121d 70%); }
+  .p2{ background: radial-gradient(circle at 50% 70%, #1d2a17, #060a06 75%); }
+  .p3{ background: linear-gradient(160deg,#2b3a2a,#0c1610 70%); }
+  .p4{ background: radial-gradient(circle at 70% 20%, #1a2233, #04060a 75%); }
+  .p5{ background: linear-gradient(160deg,#262c3a,#05070d 70%); }
+  .p6{ background: linear-gradient(160deg,#3a3220,#0d0a05 70%); }
+  .p7{ background: radial-gradient(circle at 60% 30%, #3a2a3a,#0d0a10 75%); }
+  .p8{ background: radial-gradient(circle at 40% 60%, #2a3a3a,#0a1010 75%); }
+  .p9{ background: linear-gradient(160deg,#3a1f2a,#0c0508 70%); }
+
+  .rating{
+    position:absolute; top:10px; left:10px; z-index:2;
+    background:rgba(5,7,13,0.85); border:1px solid var(--border); color:#ffce4a;
+    font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px;
+    display:flex; align-items:center; gap:4px;
+  }
+  .genre-tag{
+    position:absolute; top:10px; right:10px; z-index:2;
+    background:rgba(5,7,13,0.85); border:1px solid var(--border); color:var(--cyan);
+    font-size:10px; font-weight:800; letter-spacing:.4px; padding:3px 9px; border-radius:6px;
+  }
+  .poster-foot{
+    padding:11px 13px 14px; font-size:12px; font-weight:700; letter-spacing:.3px; color:var(--text);
+    display:flex; align-items:center; gap:8px;
+  }
+  .poster-foot .ftitle{
+    flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center;
+  }
+  .btn-mylist{
+    flex:none; width:26px; height:26px; border-radius:50%; border:1px solid var(--border);
+    background:rgba(255,255,255,0.04); color:var(--muted);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; line-height:1; transition:all .2s ease; cursor:pointer;
+  }
+  .btn-mylist:hover{ border-color:var(--cyan); color:var(--cyan); }
+  .btn-mylist.added{
+    background:linear-gradient(90deg, var(--cyan), var(--purple)); color:#04060b; border-color:transparent;
+  }
+
+  .empty-state{
+    grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--muted);
+  }
+  .empty-state .bar-icon{
+    width:44px; height:44px; margin:0 auto 16px; border-radius:12px; background:var(--card);
+    border:1px solid var(--border); display:flex; align-items:center; justify-content:center;
+  }
+  .empty-state h3{ color:var(--text); font-family:'Archivo Black', sans-serif; font-size:16px; margin:0 0 6px; }
+  .empty-state p{ font-size:12.5px; margin:0; }
+
+  /* ===== Pagination ===== */
+  .pagination{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    padding:34px 6% 10px; flex-wrap:wrap;
+  }
+  .page-btn{
+    min-width:38px; height:38px; padding:0 10px; border-radius:9px;
+    background:var(--card); border:1px solid var(--border); color:var(--muted);
+    font-size:12.5px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:6px;
+  }
+  .page-btn:hover:not(:disabled){ border-color:var(--cyan); color:var(--text); }
+  .page-btn.active{
+    color:#04060b; border-color:transparent;
+    background:linear-gradient(90deg, var(--cyan), var(--purple));
+  }
+  .page-btn:disabled{ opacity:.35; cursor:default; }
+  .page-btn svg{ width:13px; height:13px; }
+
+  /* ===== Footer (sama dengan Beranda) ===== */
+  footer{ margin-top:60px; border-top:1px solid var(--border); padding:46px 6% 30px; text-align:center; }
+  footer h3{
+    font-family:'Archivo Black', sans-serif; font-size:24px;
+    background:linear-gradient(90deg, var(--cyan), var(--purple));
+    -webkit-background-clip:text; background-clip:text; color:transparent; margin:0 0 10px;
+  }
+  footer p{ color:var(--muted); font-size:13px; max-width:480px; margin:0 auto; line-height:1.6; }
+  .footer-bottom{
+    margin-top:34px; padding-top:20px; border-top:1px solid var(--border);
+    text-align:center; font-size:11.5px; color:var(--muted);
+  }
+
+  /* ===== Responsif: Tablet ===== */
+  @media(max-width:768px){
+    .brandbar{ padding:34px 6% 18px; }
+    nav.menu{ gap:4px; padding:12px 4%; }
+    nav.menu a{ padding:8px 14px; font-size:12px; }
+    .page-head{ padding:32px 5% 8px; }
+    .filter-bar{ padding:20px 5% 6px; }
+    .grid{ grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:16px; }
+    .poster-art{ height:220px; }
+  }
+
+  /* ===== Responsif: Mobile ===== */
+  @media(max-width:480px){
+    .brandbar{ padding:28px 6% 14px; }
+    nav.menu{ gap:3px; padding:10px 3%; }
+    nav.menu a{ padding:7px 11px; font-size:11.5px; }
+    .page-head{ padding:26px 5% 6px; }
+    .page-head p{ font-size:12.5px; }
+    .filter-bar{ flex-direction:column; align-items:stretch; padding:18px 5% 4px; }
+    .search-wrap{ flex:1 1 100%; }
+    .sort-select{ width:100%; }
+    .genre-row{ gap:8px; padding:12px 5% 4px; }
+    .chip{ padding:8px 13px; font-size:11.5px; }
+    .grid{ grid-template-columns:repeat(3, 1fr); gap:10px; }
+    .poster-art{ height:140px; font-size:11px; padding:8px; }
+    .poster-foot{ padding:7px 8px 10px; font-size:10px; gap:5px; }
+    .rating{ font-size:9.5px; padding:2px 6px; }
+    .genre-tag{ font-size:8.5px; padding:2px 6px; }
+    .btn-mylist{ width:22px; height:22px; font-size:13px; }
+    .pagination{ gap:6px; padding:26px 5% 8px; }
+    .page-btn{ min-width:34px; height:34px; font-size:12px; }
+    .action-modal-box{ width:100%; }
+    footer{ padding:34px 6% 24px; }
+  }
+
+  /* ===== Popup Aksi Film (Putar / Tambah ke Daftar) ===== */
+  .action-modal{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(4,6,10,0.75);
+    backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity .2s ease;
+    padding:20px;
+  }
+  .action-modal.open{ opacity:1; pointer-events:auto; }
+  .action-modal-box{
+    width:min(380px, 100%);
+    background:var(--bg-soft);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+    transform:scale(.94);
+    transition:transform .2s ease;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  }
+  .action-modal.open .action-modal-box{ transform:scale(1); }
+  .action-modal-art{
+    height:180px; position:relative; background-size:cover; background-position:top center;
+    display:flex; align-items:flex-end; padding:16px;
+  }
+  .action-modal-art::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.05) 30%, rgba(5,7,13,0.92) 100%); }
+  .action-modal-art .amtitle{
+    position:relative; z-index:1; font-family:'Archivo Black', sans-serif; font-size:18px; line-height:1.25; text-align:center; width:100%;
+  }
+  .action-modal-close{
+    position:absolute; top:10px; right:10px; z-index:2;
+    width:32px; height:32px; border-radius:50%; border:1px solid var(--border);
+    background:rgba(5,7,13,0.7); color:var(--text); display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  .action-modal-close:hover{ border-color:var(--cyan); color:var(--cyan); }
+  .action-modal-body{ padding:18px 20px 22px; display:flex; flex-direction:column; gap:10px; }
+  .action-btn{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    font-weight:800; font-size:13px; letter-spacing:.4px; padding:13px 18px; border-radius:10px; border:none; width:100%;
+  }
+  .action-btn-play{ background:linear-gradient(90deg, var(--cyan), var(--purple)); color:#04060b; box-shadow:0 6px 20px rgba(47,228,255,0.25); }
+  .action-btn-list{ background:rgba(255,255,255,0.04); border:1px solid var(--border); color:var(--text); }
+  .action-btn-list.added{ background:rgba(47,228,255,0.12); border-color:var(--cyan); color:var(--cyan); }
+</style>
+</head>
+<body>
+
+<div class="brandbar">
+  <h1>CINESTREAM</h1>
+  <p>Pengalaman Sinema Premium</p>
+</div>
+
+<nav class="menu">
+  <a href="index.html">Beranda</a>
+  <a href="#" class="active">Film</a>
+  <a href="daftar-saya.html">Daftar Saya</a>
+  <a href="tentang.html">Tentang</a>
+</nav>
+
+<div class="page-head">
+  <div class="eyebrow">Pustaka Film</div>
+  <h2>JELAJAHI <span>SEMUA FILM</span></h2>
+  <p>Cari judul favoritmu, filter berdasarkan genre, dan rasakan pengalaman nonton terbaikmu.</p>
+</div>
+
+<div class="filter-bar">
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" id="search-input" placeholder="Cari judul film...">
+  </div>
+  <select class="sort-select" id="sort-select">
+    <option value="popular">Urutkan: Terpopuler</option>
+    <option value="rating">Urutkan: Rating Tertinggi</option>
+    <option value="az">Urutkan: A - Z</option>
+  </select>
+</div>
+
+<div class="genre-row" id="genre-row"></div>
+
+<div class="result-count" id="result-count"></div>
+
+<div class="grid-wrap">
+  <div class="grid" id="film-grid"></div>
+</div>
+
+<div class="pagination" id="pagination"></div>
+
+<footer>
+  <h3>CINESTREAM</h3>
+  <p>Destinasi utama untuk menikmati tontonan premium tanpa batas dengan visual memukau.</p>
+  <div class="footer-bottom">
+    <span>HAK CIPTA © 2026 CINESTREAM GLOBAL. SELURUH HAK CIPTA DILINDUNGI UNDANG-UNDANG.</span>
+  </div>
+</footer>
+
+<!-- Popup Aksi Film -->
+<div class="action-modal" id="action-modal">
+  <div class="action-modal-box">
+    <div class="action-modal-art" id="action-modal-art">
+      <button class="action-modal-close" onclick="closeMovieAction()">✕</button>
+      <span class="amtitle" id="action-modal-title"></span>
+    </div>
+    <div class="action-modal-body">
+      <button class="action-btn action-btn-play" id="action-btn-play" onclick="playCurrentMovie()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        PUTAR FILM
+      </button>
+      <button class="action-btn action-btn-list" id="action-btn-list" onclick="toggleCurrentMovieList()"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const films = [
+    {t:"PENGABDI SETAN 2", sub:"COMMUNION", r:7.0, p:"p0", genre:"Horor", img:"assets/Pengabdi Setan 2.jpg", yt:"https://youtu.be/8LIHcd7WfWI?si=ls1X2_PhX83yVagX"},
+    {t:"DIA BUKAN IBU", r:7.5, p:"p1", genre:"Horor", img:"assets/Dia bukan ibu.jpg", yt:"https://youtu.be/T6lSPpOUQgk?si=XIXcU0ZaDF7rqoCv"},
+    {t:"TINGGAL MENINGGAL", r:6.0, p:"p2", genre:["Drama", "Komedi"], img:"assets/Tinggal Meninggal.jpg", yt:"https://youtu.be/Z_G2cU5-vSk?si=wwMQyLdyrEP3CQYk"},
+    {t:"AGAK LAEN", r:7.9, p:"p3", genre:["Horor", "Komedi"], img:"assets/Agak laen1.jpg", yt:"https://youtu.be/0YLSPyGA4h0?si=X9iogN5JIrkbwfZS"},
+    {t:"PENGABDI SETAN", sub:"COMMUNION", r:7.1, p:"p4", genre:"Horor", img:"assets/Pengabdi Setan1.jpg", yt:"https://youtu.be/0hSptYxWB3E?si=fF9QThp6rjcC8jAK"},
+    {t:"DUA HATI BIRU", r:7.3, p:"p5", genre:"Drama", img:"assets/Dua hati biru.jpg", yt:"https://youtu.be/RxlI5cI93Ug?si=XrisFFPJXSsWrPNt"},
+    {t:"MENCURI RADEN SALEH", r:7.6, p:"p6", genre:"Aksi", img:"assets/Mencuri raden.jpg", yt:"https://youtu.be/DN3sRz_veBU?si=tWdwyFVidiM16rSy"},
+    {t:"GURU-GURU GOKIL", r:6.8, p:"p7", genre:"Komedi", img:"assets/Guru2 gokil.jpg", yt:"https://youtu.be/Z7kRxHxJ4dQ?si=cig0w7sBke-yMWML"},
+    {t:"TUNGGU AKU SUKSES NANTI", r:8.2, p:"p6", genre:"Drama", img:"assets/Tunggu Aku Sukses Nanti.jpg", yt:"https://youtu.be/Ga4rG82wC10?si=vKydXtivOX5-83DH"},
+    {t:"NA WILLA", r:9.2, p:"p5", genre:"Drama", img:"assets/Na willa.jpg", yt:"https://youtu.be/hnb3C5Hbk0s?si=ACNoQaCnCshBywtK"},
+    {t:"SEKAWAN LIMO 2: GUNUNG KLAWIH", r:6.9, p:"p3", genre:["Horor", "Komedi"], img:"assets/Sekawan limo2.jpg", yt:"https://youtu.be/BRBgSf9_kQ4?si=KdircgsaZTFvgPcJ"},
+    {t:"PEREMPUAN PEMBAWA SIAL", r:6.4, p:"p2", genre:"Horor", img:"assets/Perempuan pembawa.jpg", yt:"https://youtu.be/9_XO7ob7yR4?si=hDAZmEk5fh5cEvvq"},
+    {t:"DILAN ITB 1997", r:7.3, p:"p7", genre:["Drama", "Romance"], img:"assets/Dilan Itb.jpg", yt:"https://youtu.be/xzues7Sn_44?si=_8WiyTC8oSTszeiW"},
+    {t:"DUKUN MAGANG", r:7.7, p:"p8", genre:"Horor", img:"assets/Dukun magang.jpg", yt:"https://youtu.be/dCdWC4q7THE?si=PqQUkuYNZR2W-Tiy"},
+    {t:"CHILDREN OF HEAVEN", r:6.3, p:"p4", genre:"Drama", img:"assets/Children Of Heaven.jpg", yt:"https://youtu.be/OnHYKXrHG8U?si=4PFJ2RnMTbn5fXYH"},
+    {t:"DOPAMIN", r:7.4, p:"p0", genre:"Drama", img:"assets/Dopamin.jpg", yt:"https://youtu.be/wQRi_vGBU5g?si=jh_4aWHWwz4UpOvt"},
+    {t:"SEBELUM DIJEMPUT NENEK", r:6.7, p:"p1", genre:"Horor", img:"assets/Sebelum dijemput.jpg", yt:"https://youtu.be/wQHbeysp710?si=8FI0nSphnGCIaEho"},
+    {t:"MUSUH DALAM SELIMUT", r:8.0, p:"p9", genre:"Drama", img:"assets/Musuh dalam.jpg", yt:"https://youtu.be/6tQiZn-UNTU?si=HgoaTdxiA1Xcabg0"},
+    {t:"DOSEN GAIB", r:7.1, p:"p5", genre:["Horor","Thriller"], img:"assets/Dosen Gaib.jpg", yt:"https://youtu.be/5rJTBoWUVAo?si=4OUVUtIBFVJxfI8Z"},
+    {t:"1 KAKAK 7 PONAKAN", r:6.6, p:"p6", genre:"Komedi", img:"assets/Home Sweet Loan.jpg", yt:"https://youtu.be/LkUsJMFngiI?si=ybtCkozMGXmxLtxU"},
+    {t:"QORIN 2", r:7.6, p:"p7", genre:["Horor"], img:"assets/Qorin2.jpg", yt:"https://youtu.be/evef2t6F26I?si=THi2b5V7NE7_dYRa"},
+    {t:"JANGAN PANGGIL MAMA KAFIR", r:10.0, p:"p7", genre:["Drama"], img:"assets/Janganpanggil.jpg", yt:"https://youtu.be/rNE8IHQHh3s?si=2SLeVKrnDQ8CqOZ6"},
+    {t:"GHOST IN THE CELL", r:8.0, p:"p7", genre:["Horor", "Thriller"], img:"assets/Ghost in.jpg", yt:"https://youtu.be/otL78_pk_A0?si=Pht6ekWmPVjO2Vs_"},
+    {t:"KKN DI DESA PENARI", r:3.0, p:"p7", genre:["Horor", "Thriller"], img:"assets/Kkn.jpg", yt:"https://youtu.be/01BPk6M37qs?si=Ak2twE3YF-vBBrVc"},
+    {t:"GUDANG MERICA", r:6.7, p:"p7", genre:["Horor", "Thriller", "Komedi"], img:"assets/Gudangmerica.jpg", yt:"https://youtu.be/1weXCXIYrWs?si=gITeGET2KLC1TOUo"},
+    {t:"PELANGI DI MARS", r:9.7, p:"p7", genre:["Sci-Fi"], img:"assets/Pelangi di Mars.jpg", yt:"https://youtu.be/9LpDXdHgbYo?si=Cm4IscMLpAQ8sb5_"},
+    {t:"HANGOUT", r:4.7, p:"p7", genre:["Komedi", "Thriller"], img:"assets/Hangout.jpg", yt:"https://youtu.be/qLrClBoAT6M?si=2IC6nJmq-nVi6rpT"},
+    {t:"LEGENDA KELAM MALIN KUNDANG", r:8.9, p:"p7", genre:["Thriller"], img:"assets/Legenda Kelam.jpg", yt:"https://youtu.be/tu5kRtyIU3U?si=7UdRIyINncrmdadt"},
+    {t:"HANYA NAMAMU DALAM DOAKU", r:7.9, p:"p7", genre:["Drama"], img:"assets/Hanyanama.jpg", yt:"https://youtu.be/v3PpTYzjXbo?si=hPGy1cBsgRvnY6JS"},
+    {t:"JATUH CINTA SEPERTI DI FILM-FILM", r:9.2, p:"p7", genre:["Drama", "Romance"], img:"assets/JATUH CINTA SEPERTI DI FILM2.jpg", yt:"https://youtu.be/F6jPobzz-ag?si=BQLlmw1ylAFYfNAj"},
+    {t:"SUKA DUKA TAWA", r:9.2, p:"p7", genre:["Drama"], img:"assets/Suka duka.jpg", yt:"https://youtu.be/Po1pIzO5PPw?si=B33srNw7pKXzUIox"},
+    {t:"TUMBAL PROYEK", r:9.2, p:"p7", genre:["Horor", "Thriller"], img:"assets/Tumbalproyek.jpg", yt:"https://youtu.be/Pf-YdLxmu8M?si=3GtSY9-4zV74PpLh"},
+    {t:"RANGGA DAN CINTA", r:7.8, p:"p7", genre:["Drama", "Romance"], img:"assets/rangga1.jpg", yt:"https://youtu.be/otTjJZUFGl0?si=VePutDI_hkyrxuL4"},
+    {t:"DILAN 1983: WO AI NI", r:4.0, p:"p7", genre:["Drama", "Romance"], img:"assets/dilan1983.jpg", yt:"https://youtu.be/-TqgMfZg4Po?si=PrB8iOws1JkqQjWS"},
+    {t:"PABRIK GULA", r:7.0, p:"p7", genre:["Horor", "Thriller"], img:"assets/pabrikgula.jpg", yt:"https://youtu.be/Uvp2ZBK7Vnc?si=PWi4XpaYJPSX6884"},
+    {t:"AGAK LAEN: MENYALA PANTIKU", r:8.7, p:"p7", genre:["Drama", "Thriller"], img:"assets/Agak laen 2.jpg", yt:"https://youtu.be/KGWkDj_vMOM?si=wehwfSF5DRWogYwA"},
+    {t:"WAKTU MAGHRIB 2", r:6.2, p:"p7", genre:["Horor"], img:"assets/waktumgb2.jpg", yt:"https://youtu.be/ccfaKsknHqs?si=_fabtimv16HJtYyj"},
+    {t:"SEKAWAN LIMO", r:9.0, p:"p7", genre:["Horor", "Komedi"], img:"assets/sekawanlimo1.jpg", yt:"https://youtu.be/Wp2GiL5TL0k?si=DgdCHqjB2hDryrzx"},
+    {t:"PENGEPUNGAN DI BUKIT DURI", r:8.5, p:"p7", genre:["Aksi", "Thriller"], img:"assets/pengepungan.jpg", yt:"https://youtu.be/OBbE4wK47ts?si=IdAua8y_yvtWWmlP"},
+    {t:"SADALI", r:6.3, p:"p7", genre:["Drama", "Romance"], img:"assets/sadali.jpg", yt:"https://youtu.be/CNATu6BHBLY?si=vaT3Q_an9cptYbRG"},
+    {t:"LIKE & SHARE", r:5.5, p:"p7", genre:["Drama"], img:"assets/like.jpg", yt:"https://youtu.be/STa4wgzAWfg?si=Awo-KoRbD_m0xHge"},
+    {t:"AUTOBIOGRAPHY", r:10.0, p:"p7", genre:["Drama", "Thriller"], img:"assets/auto.jpg", yt:"https://youtu.be/4vf92ZJzou0?si=lvejqn2jpBgGiChO"},
+    {t:"WARUNG POCONG", r:3.0, p:"p7", genre:["Horor", "Komedi"], img:"assets/warung.jpg", yt:"https://youtu.be/glH4L4GOJQk?si=uhehO0Ck8c1WYu_2"},
+    {t:"MODAL NEKAD", r:8.6, p:"p7", genre:["Drama", "Komedi"], img:"assets/modal.jpg", yt:"https://youtu.be/UrRLi-uztfM?si=1m6cz2SxFz9-zD4p"},
+    {t:"MODUAL NEKAD", r:6.2, p:"p7", genre:["Drama", "Komedi"], img:"assets/modual.jpg", yt:"https://youtu.be/UrRLi-uztfM?si=rwDlSB0qyOZaQfo-"},
+    {t:"TERLALU TAMPAN", r:9.0, p:"p7", genre:["Drama", "Romance", "Komedi"], img:"assets/terlalu.jpg", yt:"https://youtu.be/gyibcholOzg?si=S-_EBdDIs5VJaadQ"},
+    {t:"GALAKSI", r:7.4, p:"p7", genre:["Drama", "Romance"], img:"assets/galaxsi.jpg", yt:"https://youtu.be/43bKU_Zk_yI?si=3Ir-er69aDWkaREe"},
+    {t:"GITA CINTA DARI SMA", r:7.1, p:"p7", genre:["Drama", "Romance"], img:"assets/gitacinta.jpg", yt:"https://youtu.be/GRxrzUKxmMs?si=BOm20SAZLCEvUYSc"},
+    {t:"PUSPA INDAH TAMAN HATI", r:6.6, p:"p7", genre:["Drama", "Romance"], img:"assets/puspa.jpg", yt:"https://youtu.be/_PODEpX5LUE?si=2DBZhzEPb9yfFlG9"},
+    {t:"5 CM", r:8.8, p:"p7", genre:["Drama", "Romance"], img:"assets/5cm.jpg", yt:"https://youtu.be/wT2aPdXwdt8?si=4fNB9wJ1IkzYg0J-"},
+    {t:"JUMBO", r:8.3, p:"p7", genre:["Animasi"], img:"assets/jumbo.jpg", yt:"https://youtu.be/yMqDgbZmBdk?si=gijiobAyhxa0olNz"},
+    {t:"GARUDA DI DADAKU", r:6.6, p:"p7", genre:["Animasi"], img:"assets/garudadi.jpg", yt:"https://youtu.be/2fR1iikWNrY?si=auRFL8xSy7MFcfwr"},
+    {t:"DANUR: THE LAST CHAPTER", r:9.7, p:"p7", genre:["Horor", "Thriller"], img:"assets/danurlast.jpg", yt:"https://youtu.be/DZ8qYq6fAao?si=yauMQF82mIYkptdj"},
+    {t:"ALAS ROBAN", r:7.8, p:"p7", genre:["Horor", "Thriller"], img:"assets/alas.jpg", yt:"https://youtu.be/b23r0XvWW_Q?si=YRRa4gh_1ClckFg1"},
+    {t:"IPAR ADALAH MAUT", r:8.0, p:"p7", genre:["Drama", "Romance"], img:"assets/ipar.jpg", yt:"https://youtu.be/9M3VN0J5ffM?si=mI6dlMydXQ0eL9eO"},
+    {t:"SUZZANNA: SANTET DOSA DI ATAS DOSA", r:7.0, p:"p7", genre:["Horor", "Drama", "Thriller"], img:"assets/suzannadosa.jpg", yt:"https://youtu.be/D5i5XHUArr4?si=pNMciifQ_l0VqW-N"},
+    {t:"KELUARGA CEMARA 2", r:8.0, p:"p7", genre:["Drama"], img:"assets/Cemara 2.jpg", yt:"https://youtu.be/DdpM2cLoJUQ?si=_70gldZ5SEQS5e34"},
+    {t:"BOLEHKAH SEKALI SAJA KUMENANGIS", r:8.0, p:"p7", genre:["Drama"], img:"assets/bolehkahsekali.jpg", yt:"https://youtu.be/j-UOIJezxXo?si=y8nO1c-hlVgmlqw1"},
+    {t:"BUDI PEKERTI", r:9.8, p:"p7", genre:["Drama"], img:"assets/budipekerti.jpg", yt:"https://youtu.be/dRifUoU817E?si=L-pvyMLjKs1jBo1d"},
+    {t:"CINTA DALAM IKHLAS", r:8.8, p:"p7", genre:["Drama", "Romance"], img:"assets/cintadalam.jpg", yt:"https://youtu.be/w_91yzlwSbo?si=QJxx_7s7mqKvBQKd"},
+    {t:"RUMAH DINAS BAPAK", r:6.8, p:"p7", genre:["Horor", "Komedi"], img:"assets/rumahdinas.jpg", yt:"https://youtu.be/4q0XUN7g0WE?si=Lc8qPjBeggU3H87x"},
+    {t:"SARANJANA: KOTA GHAIB", r:8.2, p:"p7", genre:["Horor"], img:"assets/saranjana.jpg", yt:"https://youtu.be/24Cqnrlzc1I?si=ah4HMpCtCEYplTLp"},
+    {t:"KEADILAN (THE VERDICT)", r:9.7, p:"p7", genre:["Drama", "Thriller", "Aksi"], img:"assets/keadilan.jpg", yt:"https://youtu.be/-9_As7lucnk?si=5buwoWLlZij8LtpM"},
+    {t:"SORE: ISTRI DARI MASA DEPAN)", r:9.3, p:"p7", genre:["Drama", "Sci-Fi", "Romance"], img:"assets/sore.jpg", yt:"https://youtu.be/HiVzpboRpR0?si=lQ3Wpw2NnmLVDKSm"},
+    {t:"WAKTU MAGHRIB", r:6.5, p:"p7", genre:["Horor", "Thriller"], img:"assets/waktumgb1.jpg", yt:"https://youtu.be/x3AtcxZIX2M?si=EIf0xpGe0Q2rcSJ3"},
+    {t:"BILA ESOK IBU TIADA", r:7.5, p:"p7", genre:["Drama"], img:"assets/bilaesok.jpg", yt:"https://youtu.be/41ZzC491wqE?si=Hy-CnWD8uNCj9_nI"},
+    {t:"KELUARGA CEMARA", r:9.1, p:"p7", genre:["Drama"], img:"assets/keluargacemara1.jpg", yt:"https://youtu.be/sGaeDzD_3o0?si=lJZ9Ow804lmZRxr7"},
+    {t:"KUYANK", r:9.3, p:"p7", genre:["Horor" ,"Drama", "Romance"], img:"assets/kuyank.jpg", yt:"https://youtu.be/z3ElDl-IWmc?si=dGRewPCzLaQT0ON_"},
+    {t:"IVANNA", r:8.1, p:"p7", genre:["Horor" ,"Thriller"], img:"assets/ivanna.jpg", yt:"https://youtu.be/O29hLG_37qI?si=Jj2Idun_nLpyC4G4"},
+    {t:"SAMPAI TITIK TERAKHIRMU", r:7.1, p:"p7", genre:["Drama" ,"Romance"], img:"assets/sampaititik.jpg", yt:"https://youtu.be/99sioyw5t80?si=AggNnAMBTdtKijzr"},
+    {t:"JENDELA SERIBU SUNGAI", r:8.1, p:"p7", genre:["Drama"], img:"assets/jendelaseribu.jpg", yt:"https://youtu.be/CjAC4tmYDZA?si=1wahlHshbTDNmM42"},
+    {t:"AYO PUTUS", r:6.5, p:"p7", genre:["Drama" ,"Romance"], img:"assets/ayoputus.jpg", yt:"https://youtu.be/Rv27wsm0giE?si=-aHTaZPk97e35XKp"},
+    {t:"AYO BALIKAN", r:8.7, p:"p7", genre:["Drama" ,"Romance"], img:"assets/ayobalikan.jpg", yt:"https://youtu.be/_T7PrTuBk9w?si=fRSvGbn83u8zTjJX"},
+    {t:"SEMUA AKAN BAIK-BAIK SAJA", r:9.1, p:"p7", genre:["Drama"], img:"assets/semuaakan.jpg", yt:"https://youtu.be/L1jfo8e0RDk?si=m4DvOCvlqvUbVWzx"},
+    {t:"KUASA GELAP", r:7.1, p:"p7", genre:["Horor", "Thriller"], img:"assets/kuasagelap.jpg", yt:"https://youtu.be/sMkUS1wqr8Q?si=CabTAkKVAw8pZPUb"},
+    {t:"RACUN SANGGA: SANTET PEMISAH RUMAH TANGGA", r:6.5, p:"p7", genre:["Horor", "Thriller"], img:"assets/racunsangga.jpg", yt:"https://youtu.be/7PAZ5IJXt_Q?si=4iquxHOZSzcMgG9a"},
+    {t:"GETIH IRENG", r:8.8, p:"p7", genre:["Horor", "Thriller"], img:"assets/getihireng.jpg", yt:"https://youtu.be/vbnON9APWvE?si=P7WgUqc3XP-XvADK"},
+    {t:"PANGKU", r:9.8, p:"p7", genre:["Drama"], img:"assets/pangku.jpg", yt:"https://youtu.be/mL5htYG4zjI?si=QnymIIvVijFzbkXA"},
+    {t:"SEWU DINO", r:7.8, p:"p7", genre:["Horor"], img:"assets/sewudino.jpg", yt:"https://youtu.be/12sXNFbQa6I?si=nKo1gL72N0EIQy-U"},
+    {t:"KANG MAK FROM PEE MAK", r:7.5, p:"p7", genre:["Horor", "Komedi"], img:"assets/kangmak.jpg", yt:"https://youtu.be/bsUI62Qlt-o?si=p5aAaX9sQ1A6_sOV"},
+    {t:"KEMBANG API", r:9.7, p:"p7", genre:["Drama", "Thriller"], img:"assets/kembangapi.jpg", yt:"https://youtu.be/1LG_fVSeAzI?si=d5QuEB_6wH9YUGA7"},
+    {t:"HIDUP INI TERLALU BANYAK KAMU", r:7.2, p:"p7", genre:["Drama", "Romance"], img:"assets/hidup ini.jpg", yt:"https://youtu.be/pdx4xP4nZio?si=oDcMWLqdATGvR4g8"},
+    {t:"MONSTER", r:8.2, p:"p7", genre:["Horor", "Thriller"], img:"assets/monster.jpg", yt:"https://youtu.be/QRsZeHe2HXQ?si=c-u_jUew9Ma9iAF-"},
+    {t:"KAKA BOSS", r:5.2, p:"p7", genre:["Drama", "Komedi"], img:"assets/kakabos.jpg", yt:"https://youtu.be/LXRnwwpXz6s?si=OMnIDSE763GZJZ_5"},
+    {t:"PETAKA GUNUNG GEDE", r:7.3, p:"p7", genre:["Horor"], img:"assets/petakagunung.jpg", yt:"https://youtu.be/P-6STU_kfaU?si=xGfwFUhUQ-H7MmVI"},
+    {t:"PAMALI: DUSUN POCONG", r:6.3, p:"p7", genre:["Horor"], img:"assets/pamalipocong.jpg", yt:"https://youtu.be/noFWKx8laVA?si=rAniKbhbYn-rWZLz"},
+    {t:"LA TAHZAN: CINTA, DOSA, LUKA", r:10.0, p:"p7", genre:["Drama"], img:"assets/latahzan.jpg", yt:"https://youtu.be/8giATBx6BJU?si=-IXIBC5dNmX83jUi"},
+    {t:"TUKAR TAKDIR", r:7.0, p:"p7", genre:["Drama", "Thriller"], img:"assets/tukartakdir.jpg", yt:"https://youtu.be/TMBolkFiVtM?si=lB-Dpp-2Pi5wBfPq"},
+    {t:"SUKMA", r:8.0, p:"p7", genre:["Horor", "Thriller"], img:"assets/sukma.jpg", yt:"https://youtu.be/ThYGMbZYTYE?si=Dvv7XarIOLXbPudN"},
+    {t:"SOSOK KETIGA: LINTRIK", r:8.2, p:"p7", genre:["Horor", "Thriller"], img:"assets/sosoklintrik.jpg", yt:"https://youtu.be/FWVykcqS2d0?si=2EiFPoR9gTdkM2Dq"},
+    {t:"PEMUKIMAN SETAN", r:6.0, p:"p7", genre:["Horor", "Aksi", "Thriller"], img:"assets/pemukiman.jpg", yt:"https://youtu.be/tNyCo3WtmzY?si=1LUo_voR4gO3yT_F"},
+    {t:"RUMAH UNTUK ALIE", r:8.0, p:"p7", genre:["Drama"], img:"assets/rumahalie.jpg", yt:"https://youtu.be/75fMnSndTa8?si=82EtvxwyFGXOEe99"},
+    {t:"PERAYAAN MATI RASA", r:9.0, p:"p7", genre:["Drama"], img:"assets/perayaan.jpg", yt:"https://youtu.be/-SqqreFK47E?si=XUsm_rI3R0S96bSV"},
+    {t:"PANGGIL AKU AYAH", r:9.6, p:"p7", genre:["Drama"], img:"assets/panggilayah.jpg", yt:"https://youtu.be/nLjzzjfwwvg?si=V864URNXPN_2XkXg"},
+    {t:"AHLAN SINGAPORE", r:7.1, p:"p7", genre:["Drama"], img:"assets/ahlan.jpg", yt:"https://youtu.be/hh705y8cckc?si=SFA8vgbN40b2TIAw"},
+    {t:"BADUT GENDONG", r:9.1, p:"p7", genre:["Horor", "Aksi", "Thriller"], img:"assets/badutgdn.jpg", yt:"https://youtu.be/8jyhBO-2qpE?si=lasM6CXsb8Hb9T67"},
+    {t:"DUA GARIS BIRU", r:8.1, p:"p7", genre:["Drama", "Romance"], img:"assets/duagaris.jpg", yt:"https://youtu.be/b0NS7FP1loU?si=DeJaNXJ7ap3kfOyg"},
+    {t:"ABADI NAN JAYA", r:9.1, p:"p7", genre:["Horor", "Aksi", "Thriller"], img:"assets/abadinan.jpg", yt:"https://youtu.be/jAMn2Tzbs6A?si=vw2m_5tGWQKQbRWa"},
+    {t:"KOMANG", r:7.1, p:"p7", genre:["Drama","Romance"], img:"assets/komang.jpg", yt:"https://youtu.be/BpvnEiG9bTE?si=MOwt0ft0TAGLsx5Z"},
+    {t:"DIBAWAH UMUR", r:6.1, p:"p7", genre:["Drama","Romance"], img:"assets/dibawah.jpg", yt:"https://youtu.be/duwMeUDAfvo?si=x-vD6s2M_g2-HFSU"},
+    {t:"DILAN 1990", r:8.7, p:"p7", genre:["Drama", "Romance"], img:"assets/dilan1990.jpg", yt:"https://youtu.be/X_b-wNkz4DU?si=tPCHoCeSty76Ofk_"},
+    {t:"DILAN 1991", r:9.7, p:"p7", genre:["Drama", "Romance"], img:"assets/dilan1991.jpg", yt:"https://youtu.be/nwhB2Hb7g5c?si=zvLcjSlPdEnAnSqg"},
+    {t:"ANCIKA: DIA YANG BERSAMAKU 1995", r:8.2, p:"p7", genre:["Drama", "Romance"], img:"assets/ancika.jpg", yt:"https://youtu.be/nwhB2Hb7g5c?si=zvLcjSlPdEnAnSqg"},
+    {t:"JADI TUH BARANG", r:9.1, p:"p7", genre:["Drama", "Comedy"], img:"assets/jadituh.jpg", yt:"https://youtu.be/DbOa2bGLNWA?si=7OUg_SlTd7ewhmPz"},
+    {t:"PESUGIHAN SATE GAGAK", r:8.1, p:"p7", genre:["Horor", "Komedi"], img:"assets/pesugihansate.jpg", yt:"https://youtu.be/rSuC5yoC5r8?si=GNHS7iumCYH9r126"},
+    {t:"BAPAKMU KIPER", r:9.1, p:"p7", genre:["Drama", "Komedi"], img:"assets/bapakmukiper.jpg", yt:"https://youtu.be/Fx6FYYctAnA?si=j5jw8vX0urdjx9nq"},
+    {t:"HARUSNYA HORROR", r:6.5, p:"p7", genre:["Horor", "Komedi"], img:"assets/harusnyahoror.jpg", yt:"https://youtu.be/2WE4hho36nU?si=3LlD2mpxU0TYfMYd"},
+    {t:"CEK KHODAM", r:8.7, p:"p7", genre:["Horor", "Komedi"], img:"assets/cekkhodam.jpg", yt:"https://youtu.be/GgxWZoraKqE?si=OMGxG-BpbqyFc6hh"},
+    {t:"FOUFO", r:9.0, p:"p7", genre:["Komedi", "Sci-Fi"], img:"assets/foufo.jpg", yt:"https://youtu.be/U5W4IuVb9sY?si=Z7u4HDT-P65YDhaz"},
+    {t:"RUMAH SINGGAH", r:7.1, p:"p7", genre:["Drama"], img:"assets/rumahsinggah.jpg", yt:"https://youtu.be/dD2nQAczloA?si=zkQyISY8kz1xQ1ai"},
+    {t:"DAN BANDUNG", r:5.1, p:"p7", genre:["Drama", "Romance"], img:"assets/danbandung.jpg", yt:"https://youtu.be/sfr8o_vKtEY?si=SEPhFRasILlXsQMl"},
+    {t:"OPERASI PESTA COPET", r:8.5, p:"p7", genre:["Drama", "Komedi"], img:"assets/operasipesta.jpg", yt:"https://youtu.be/XU6YhclaXH0?si=F5Z-eREjQX3NJUnd"},
+  ];
+
+  const genres = ["Semua", "Horor", "Drama", "Komedi", "Aksi", "Thriller", "Sci-Fi", "Romance", "Animasi"];
+  const PER_PAGE = 123;
+
+  let state = { q:"", genre:"Semua", sort:"popular", page:1 };
+
+  /* ===== Daftar Saya (localStorage) ===== */
+  const MYLIST_KEY = 'cinestream_daftarsaya';
+  window.__movieMap = window.__movieMap || {};
+  function getMyList(){
+    try{ return JSON.parse(localStorage.getItem(MYLIST_KEY)) || []; }catch(e){ return []; }
+  }
+  function saveMyList(list){ localStorage.setItem(MYLIST_KEY, JSON.stringify(list)); }
+  function isInMyList(title){ return getMyList().some(x => x.t === title); }
+  function registerMovie(m){ window.__movieMap[m.t] = m; }
+  function toggleMyList(title){
+    const m = window.__movieMap[title];
+    if(!m) return;
+    let list = getMyList();
+    const idx = list.findIndex(x => x.t === title);
+    if(idx > -1){ list.splice(idx, 1); }
+    else{ list.push({t:m.t, sub:m.sub||null, r:m.r, p:m.p, img:m.img||null, yt:m.yt||null, genre:m.genre||null, coming:m.coming||false}); }
+    saveMyList(list);
+    render();
+  }
+
+  function posterCard(m){
+    registerMovie(m);
+    const bg = m.img ? `style="background-image:url('${m.img}');background-size:cover;background-position:top center;"` : '';
+    const safeTitle = m.t.replace(/'/g, "\\'");
+    return `
+      <div class="poster" onclick="openMovieAction('${safeTitle}')" style="cursor:pointer;">
+        <div class="poster-art ${m.img ? '' : m.p}" ${bg}>
+          <span class="rating">★ ${m.r.toFixed(1)}</span>
+          ${m.img ? '' : `<span class="title">${m.t}${m.sub ? `<br><small style="font-weight:500;font-size:11px;color:#9aa3b5;">${m.sub}</small>` : ''}</span>`}
+        </div>
+        <div class="poster-foot">
+          <span class="ftitle">${m.t}</span>
+        </div>
+      </div>`;
+  }
+
+  /* ===== Popup Aksi Film (Putar / Tambah ke Daftar) ===== */
+  let currentActionMovie = null;
+  function openMovieAction(title){
+    const m = window.__movieMap[title];
+    if(!m) return;
+    currentActionMovie = m;
+    const art = document.getElementById('action-modal-art');
+    art.className = 'action-modal-art' + (m.img ? '' : ' ' + (m.p || 'p0'));
+    art.style.backgroundImage = m.img ? `url('${m.img}')` : '';
+    document.getElementById('action-modal-title').innerHTML =
+      m.t + (m.sub ? `<br><small style="font-weight:500;font-size:12px;color:#9aa3b5;">${m.sub}</small>` : '');
+    // Hide play button for coming movies
+    document.getElementById('action-btn-play').style.display = (m.yt && !m.coming) ? 'flex' : 'none';
+    updateActionListButton();
+    document.getElementById('action-modal').classList.add('open');
+    document.body.classList.add('locked');
+  }
+  function updateActionListButton(){
+    if(!currentActionMovie) return;
+    const btn = document.getElementById('action-btn-list');
+    const added = isInMyList(currentActionMovie.t);
+    btn.classList.toggle('added', added);
+    if(currentActionMovie.coming){
+      btn.innerHTML = added
+        ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> HAPUS DARI PENGINGAT`
+        : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg> INGATKAN SAYA`;
+    } else {
+      btn.innerHTML = added
+        ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> HAPUS DARI DAFTAR SIMPAN`
+        : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg> TAMBAH KE DAFTAR SIMPAN`;
+    }
+  }
+  function toggleCurrentMovieList(){
+    if(!currentActionMovie) return;
+    toggleMyList(currentActionMovie.t);
+    updateActionListButton();
+  }
+  function playCurrentMovie(){
+    if(currentActionMovie && currentActionMovie.yt) window.open(currentActionMovie.yt, '_blank');
+  }
+  function closeMovieAction(){
+    currentActionMovie = null;
+    document.getElementById('action-modal').classList.remove('open');
+    document.body.classList.remove('locked');
+  }
+  document.getElementById('action-modal').addEventListener('click', e=>{
+    if(e.target.id === 'action-modal') closeMovieAction();
+  });
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape') closeMovieAction();
+  });
+
+  function renderGenres(){
+    document.getElementById('genre-row').innerHTML = genres.map(g =>
+      `<button class="chip ${state.genre===g ? 'active':''}" onclick="setGenre('${g}')">${g}</button>`
+    ).join('');
+  }
+
+  function setGenre(g){ state.genre = g; state.page = 1; render(); }
+
+  function getFiltered(){
+    let list = films.filter(m => {
+      const matchQ = m.t.toLowerCase().includes(state.q.toLowerCase());
+      const matchG = state.genre === "Semua" || m.genre.includes (state.genre);
+      return matchQ && matchG;
+    });
+    if(state.sort === "rating"){ list = list.slice().sort((a,b)=> b.r - a.r); }
+    else if(state.sort === "az"){ list = list.slice().sort((a,b)=> a.t.localeCompare(b.t)); }
+    return list;
+  }
+
+  function render(){
+    renderGenres();
+    const filtered = getFiltered();
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+    if(state.page > totalPages) state.page = totalPages;
+    const start = (state.page - 1) * PER_PAGE;
+    const pageItems = filtered.slice(start, start + PER_PAGE);
+
+    document.getElementById('result-count').innerHTML =
+      filtered.length ? `Menampilkan <b>${pageItems.length}</b> dari <b>${filtered.length}</b> judul` : '';
+
+    const grid = document.getElementById('film-grid');
+    if(pageItems.length === 0){
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="bar-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c8499" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          </div>
+          <h3>Film tidak ditemukan</h3>
+          <p>Coba kata kunci lain atau ubah filter genre.</p>
+        </div>`;
+    } else {
+      grid.innerHTML = pageItems.map(posterCard).join('');
+    }
+
+    renderPagination(totalPages);
+  }
+
+  function renderPagination(totalPages){
+    const el = document.getElementById('pagination');
+    if(totalPages <= 1){ el.innerHTML = ''; return; }
+    let html = `<button class="page-btn" ${state.page===1?'disabled':''} onclick="goPage(${state.page-1})">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 6l-6 6 6 6"/></svg>
+    </button>`;
+    for(let i=1; i<=totalPages; i++){
+      html += `<button class="page-btn ${i===state.page?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    }
+    html += `<button class="page-btn" ${state.page===totalPages?'disabled':''} onclick="goPage(${state.page+1})">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
+    </button>`;
+    el.innerHTML = html;
+  }
+
+  function goPage(p){ state.page = p; render(); window.scrollTo({top:0, behavior:'smooth'}); }
+
+  document.getElementById('search-input').addEventListener('input', e => {
+    state.q = e.target.value; state.page = 1; render();
+  });
+  document.getElementById('sort-select').addEventListener('change', e => {
+    state.sort = e.target.value; state.page = 1; render();
+  });
+
+  render();
+</script>
+
+</body>
+</html>
